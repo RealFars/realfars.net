@@ -1,0 +1,12 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.content-section {
+    text-align: center;
+    font-family: Verdana, sans-serif;
+}
