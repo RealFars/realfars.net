@@ -10,3 +10,8 @@ body {
     text-align: center;
     font-family: Verdana, sans-serif;
 }
+
+img {
+    width: 100%;
+    height: auto
+}
