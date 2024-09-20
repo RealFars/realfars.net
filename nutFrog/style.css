@@ -1,0 +1,9 @@
+iframe{
+    position: absolute;
+    left: 50%;
+    margin-left: -420px;
+}
+
+button{
+    visibility: hidden;
+}
