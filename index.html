@@ -8,11 +8,30 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div>
-        <h1 id="header">realfars.net</h1>
-        <a id="header2" href="nutFrog/nutFrog.html">NOW WITH NUTFROG!</a>
-        <img id="RatImage" src="rat.svg" alt="Pixel Art Rat">
+    <div class="games">
+        <div class="NutFrog">
+            <img src="icons/defaultPlayer.svg" alt="PLAY NutFrog">
+            <br>
+            <a id="header2" href="nutFrog/nutFrog.html">NOW WITH NUTFROG!</a>
+        </div>
     </div>
+
+    <div class="bottom-bar">
+        <div class="bottom-left">
+            DAY MM/DD/YYY
+            </br>
+            HH:MM
+        </div>
+        <div class="bottom-middle">
+            realfars.net
+            </br>
+            silly website by RealFars
+        </div>
+        <div class="bottom-right">
+            <img class="ratImage" src="rat.svg" onclick="imageClickCounter()">
+        </div>
+    </div>
+    
     <script src="index.js"></script>
 </body>
 </html>

@@ -2,9 +2,7 @@
 
 let clickCount = 0;
 
-document.getElementById("RatImage").addEventListener("click", function() {
+function imageClickCounter(){
     clickCount++;
-
-    document.getElementById("header").textContent = "Counter:";
-        document.getElementById("header2").textContent = clickCount.toString()
-});
+    console.log("Counter: " + clickCount.toString());
+};
