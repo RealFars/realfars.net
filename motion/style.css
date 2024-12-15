@@ -1,0 +1,33 @@
+body{
+    background-color: #101010;
+}
+
+h1{
+    color: #bfadea;
+    text-align: center;
+}
+
+iframe{
+    position: absolute;
+    left: 50%;
+    margin-left: -420px;
+}
+
+div {
+    position: fixed;
+    left: 50%;
+    bottom: 20px;
+    transform: translate(-50%, -50%);
+    margin: 0 auto;
+  }
+
+button {
+    border: none;
+    background-color: #bfadea;
+    padding: 20px 42px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    cursor: pointer;
+  }
