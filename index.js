@@ -1,5 +1,4 @@
-//:^
-const date = new Date();
+//:^3
 
 const weekdays={ 
     "0":"Sunday", 
@@ -11,12 +10,18 @@ const weekdays={
     "6":"Saturday"
 };
 
-window.setTimeout(upateDateStuff, 100);
+setInterval(function () {
+    const date = new Date();
+    var dateString
+    var timeString
 
-function upateDateStuff(){
-    var dateString = weekdays[date.getDay()] + ", " + date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
+    dateString = weekdays[date.getDay()] + ", " + date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
     document.getElementById("dateDisplay").innerHTML = dateString;
 
-    var timeString = date.getHours() + ":" + date.getMinutes()
+    if (date.getSeconds() % 2 != 0){
+        timeString = date.getHours() + ":" + date.getMinutes()
+    } else if (date.getSeconds() % 2 == 0){
+        timeString = date.getHours() + " " + date.getMinutes()
+    }
     document.getElementById("timeDisplay").innerHTML = timeString;
-}
+}, 1000);
