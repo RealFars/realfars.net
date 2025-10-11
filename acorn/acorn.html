@@ -4,7 +4,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
 		<title>acorn</title>
-		<script src="warning.js"></script>
 		<style>
 html, body, #canvas {
 	margin: 0;
@@ -93,7 +92,7 @@ body {
 		</style>
 		<link id="-gd-engine-icon" rel="icon" type="image/png" href="acorn.icon.png" />
 <link rel="apple-touch-icon" href="acorn.apple-touch-icon.png"/>
-
+<script src="warning.js"></script>
 	</head>
 	<body>
 		<canvas id="canvas">
@@ -112,7 +111,7 @@ body {
 
 		<script src="acorn.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"acorn","experimentalVK":false,"fileSizes":{"acorn.pck":16608,"acorn.wasm":38057390},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"acorn","experimentalVK":false,"fileSizes":{"acorn.pck":32936,"acorn.wasm":38057390},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
@@ -212,84 +211,9 @@ const engine = new Engine(GODOT_CONFIG);
 			},
 		}).then(() => {
 			setStatusMode('hidden');
-			// Enforce integer scaling of the canvas so the game is shown
-			// only at whole-number multiples of the initial viewport size.
-			try {
-				enforceIntegerScaling();
-			} catch (e) {
-				console.warn('enforceIntegerScaling failed', e);
-			}
 		}, displayFailureNotice);
 	}
 }());
-
-		// Limit canvas scaling to integer multiples of the initial viewport.
-		function enforceIntegerScaling() {
-			const canvas = document.getElementById('canvas');
-			if (!canvas) return;
-
-			// Determine the game's logical (CSS) viewport size to use as the base.
-			// Godot usually sets `canvas.style.width/height` to the logical size in px
-			// and `canvas.width/height` to the backing store (device pixels).
-			let baseWidth = 0;
-			let baseHeight = 0;
-			if (canvas.style && canvas.style.width && canvas.style.width.endsWith('px')) {
-				baseWidth = parseInt(canvas.style.width, 10);
-			}
-			if (canvas.style && canvas.style.height && canvas.style.height.endsWith('px')) {
-				baseHeight = parseInt(canvas.style.height, 10);
-			}
-			if (!baseWidth || !baseHeight) {
-				const rect = canvas.getBoundingClientRect();
-				baseWidth = Math.max(1, Math.round(rect.width)) || 640;
-				baseHeight = Math.max(1, Math.round(rect.height)) || 480;
-			}
-
-			canvas.dataset.baseWidth = baseWidth;
-			canvas.dataset.baseHeight = baseHeight;
-
-			// Use crisp pixel rendering for integer upscales
-			canvas.style.imageRendering = 'pixelated';
-
-			// Position the canvas centered in the viewport
-			canvas.style.position = 'absolute';
-			canvas.style.left = '50%';
-			canvas.style.top = '50%';
-			canvas.style.transform = 'translate(-50%, -50%)';
-
-			function adjust() {
-				const bw = Number(canvas.dataset.baseWidth) || baseWidth;
-				const bh = Number(canvas.dataset.baseHeight) || baseHeight;
-				// Compute the largest integer scale that fits both width and height
-				const scale = Math.max(1, Math.floor(Math.min(window.innerWidth / bw, window.innerHeight / bh)));
-				canvas.style.width = (bw * scale) + 'px';
-				canvas.style.height = (bh * scale) + 'px';
-			}
-
-			window.addEventListener('resize', adjust, {passive: true});
-			window.addEventListener('orientationchange', adjust, {passive: true});
-
-			// Watch for Godot modifying the canvas style (it sets style.width/style.height)
-			const mo = new MutationObserver((mutations) => {
-				for (const m of mutations) {
-					if (m.type === 'attributes' && (m.attributeName === 'style' || m.attributeName === 'width' || m.attributeName === 'height')) {
-						// Recompute base from Godot's logical size if it changed
-						if (canvas.style && canvas.style.width && canvas.style.width.endsWith('px')) {
-							canvas.dataset.baseWidth = parseInt(canvas.style.width, 10);
-						}
-						if (canvas.style && canvas.style.height && canvas.style.height.endsWith('px')) {
-							canvas.dataset.baseHeight = parseInt(canvas.style.height, 10);
-						}
-						adjust();
-						break;
-					}
-				}
-			});
-			mo.observe(canvas, {attributes: true, attributeFilter: ['style', 'width', 'height']});
-
-			// initial adjustment
-			adjust();
-		}
 		</script>
 	</body>
 </html>
