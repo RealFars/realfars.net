@@ -19,8 +19,8 @@
 
             setTimeout(() => {
                 message.remove();
-            }, 120000);
-            //remove after 2 minutes
+            }, 60000);
+            //remove after 60 seconds
         }
     });
 
