@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Unit 2</title>
+
+  <style>
+  :root{--max-width:820px}
+  *,*::before,*::after{box-sizing:border-box}
+  body{
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    margin:12px;
+    padding:env(safe-area-inset-top) 12px 12px env(safe-area-inset-left);
+    -webkit-font-smoothing:antialiased;
+    color:#111;
+  }
+  h1{font-size:clamp(1.1rem,4vw,1.6rem);margin:8px 0 12px}
+  .reveal-btn{padding:10px 12px;font-size:1rem;border-radius:8px;margin:8px 0;display:inline-block}
+  /* Table base */
+  .table-wrap{width:100%;overflow:auto}
+  table{border-collapse:collapse;width:100%;max-width:var(--max-width);font-size:0.98rem}
+  th,td{border:1px solid #bbb;padding:8px;text-align:left;vertical-align:middle;white-space:normal}
+  th{background:#f3f4f6}
+  caption{font-size:1.1rem;margin-bottom:8px}
+  .hidden-cell{background:#111;color:transparent;border-radius:2px;cursor:pointer;user-select:none;display:inline-block;padding:2px 4px;white-space:normal}
+  .hidden-cell:focus{outline:3px solid #2b8cff}
+
+  /* Mobile: stacked rows */
+  @media (max-width:640px){
+    /* Buttons full-width */
+    .reveal-btn{display:block;width:100%}
+    /* Make table rows stack as blocks */
+    thead{display:none}
+    table, tbody, tr, td, th { display:block; width:100% }
+    tr{margin:0 0 10px;border:0;padding:0}
+    td{padding:10px;border:1px solid #ddd;display:flex;justify-content:space-between;align-items:flex-start}
+    td::before{
+      content: attr(data-label);
+      font-weight:600;
+      margin-right:12px;
+      color:#333;
+      flex:0 0 auto;
+    }
+    /* Nummer kleiner */
+    td[data-label="#"]{font-size:0.95rem}
+    /* Ensure hidden blocks don't overflow */
+    .hidden-cell{max-width:60vw;overflow:hidden;text-overflow:ellipsis}
+    .table-wrap{overflow:visible}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms!important;transition-duration:0.001ms!important}
+  }
+
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:24px}
+  table{border-collapse:collapse;width:100%;max-width:820px}
+    th,td{border:1px solid #bbb;padding:8px;text-align:left;vertical-align:middle}
+    th{background:#f3f4f6}
+    caption{font-size:1.2rem;margin-bottom:8px}
+    .reveal-btn{margin:12px 0;padding:8px 12px;border-radius:6px;border:1px solid #888;background:#f7f7f8;cursor:pointer}
+    /* Styles für verdeckte Zellen */
+    .hidden-cell{background:#111;color:transparent;border-radius:2px;cursor:pointer;user-select:none;display:inline-block;padding:2px 4px}
+    .hidden-cell:focus{outline:3px solid #2b8cff}
+
+    /* Druck-Layout: nur Tabelle sichtbar, keine Zeilen- oder Kopfaufteilung */
+    @media print {
+      body * { visibility: hidden !important; }
+      #vocab-table, #vocab-table * { visibility: visible !important; }
+      #vocab-table { position: absolute !important; left: 0; top: 0; width: 100% !important; }
+      thead { display: table-header-group; }
+      tfoot { display: table-footer-group; }
+      table { page-break-inside: auto; }
+      tr    { page-break-inside: avoid; break-inside: avoid; }
+      td, th { page-break-inside: avoid; break-inside: avoid; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Unit 2</h1>
+
+  <button id="reveal-all" class="reveal-btn">Alle aufdecken</button>
+  <button id="hide-english" class="reveal-btn">Englisch ein-/ausblenden</button>
+  <button id="hide-german" class="reveal-btn">Deutsch ein-/ausblenden</button>
+
+  <div class="table-wrap">
+  <table id="vocab-table">
+    <!-- reduzierte Spalten: Nummer, English, Deutsch -->
+    <colgroup>
+      <col style="width:40px">   <!-- Nummer -->
+      <col style="width:380px">  <!-- English -->
+      <col style="width:380px">  <!-- Deutsch -->
+    </colgroup>
+    <caption>Liste</caption>
+    <thead>
+      <tr><th>#</th><th>English</th><th>Deutsch</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+  <script>
+    const tableBody = document.querySelector('#vocab-table tbody');
+    const revealAllBtn = document.getElementById('reveal-all');
+
+    // Platzhalterlängen für jede Daten-Spalte
+    const placeholderLengths = {
+      english: 20,
+      german: 13
+    };
+
+    function makeHiddenSpan(text, columnKey){
+      const span = document.createElement('span');
+      span.className = 'hidden-cell';
+      span.tabIndex = 0;
+      span.setAttribute('role','button');
+      span.setAttribute('aria-pressed','false');
+      span.dataset.value = text || '';
+      // Länge basierend auf columnKey
+      let len = placeholderLengths.german;
+      if(columnKey === 'english') len = placeholderLengths.english;
+      else if(columnKey === 'german') len = placeholderLengths.german;
+      span.textContent = '█'.repeat(Math.max(1, len));
+      span.addEventListener('click', reveal);
+      span.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); reveal.call(span); } });
+      return span;
+    }
+
+    function reveal(e){
+      const el = (this instanceof HTMLElement) ? this : e.currentTarget;
+      el.textContent = el.dataset.value;
+      el.style.color = '';
+      el.style.background = 'transparent';
+      el.setAttribute('aria-pressed','true');
+      el.classList.remove('hidden-cell');
+      el.tabIndex = -1;
+    }
+
+    function render(list){
+      tableBody.innerHTML = '';
+      list.forEach((item,idx)=>{
+        let eng = '', germ = '';
+        if (item && typeof item === 'object'){
+          if (item.english || item.german){
+            eng = item.english || '';
+            germ = item.german || '';
+          } else {
+            const keys = Object.keys(item);
+            if(keys.length === 1 && typeof item[keys[0]] === 'object'){
+              eng = keys[0];
+              germ = item[eng]?.german || item[keys[0]].german || '';
+            }
+          }
+        }
+        const tr = document.createElement('tr');
+        const cols = [ (idx+1).toString(), eng, germ ];
+        cols.forEach((c,i)=>{
+          const td = document.createElement('td');
+          // setze data-label für das mobile stacked layout
+          td.dataset.label = (i===0) ? '#' : (i===1) ? 'English' : 'Deutsch';
+          if(i===0){
+            td.textContent = c;
+          } else if (i===1){
+            // English jetzt ebenfalls verdeckt
+            const span = makeHiddenSpan(c, 'english');
+            td.appendChild(span);
+          } else {
+            const span = makeHiddenSpan(c, 'german');
+            td.appendChild(span);
+          }
+          tr.appendChild(td);
+        });
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function revealAll(){
+      document.querySelectorAll('.hidden-cell').forEach(el=>{
+        el.textContent = el.dataset.value;
+        el.style.color = '';
+        el.style.background = 'transparent';
+        el.classList.remove('hidden-cell');
+        el.tabIndex = -1;
+      });
+    }
+
+    // hide only English column
+    function hideColumn(colIndex, columnKey){
+      document.querySelectorAll(`#vocab-table tbody td:nth-child(${colIndex}) span`).forEach(el=>{
+        const len = placeholderLengths[columnKey];
+        el.textContent = '█'.repeat(Math.max(1, len));
+        el.style.color = 'transparent';
+        el.style.background = '#111';
+        el.classList.add('hidden-cell');
+        el.tabIndex = 0;
+        el.setAttribute('aria-pressed','false');
+      });
+    }
+
+    function revealColumn(colIndex){
+      document.querySelectorAll(`#vocab-table tbody td:nth-child(${colIndex}) span`).forEach(el=>{
+        el.textContent = el.dataset.value;
+        el.style.color = '';
+        el.style.background = 'transparent';
+        el.classList.remove('hidden-cell');
+        el.tabIndex = -1;
+      });
+    }
+
+    function isColumnHidden(colIndex){
+      return !!document.querySelector(`#vocab-table tbody td:nth-child(${colIndex}) span.hidden-cell`);
+    }
+
+    function toggleEnglish(){
+      // English ist td:nth-child(2)
+      if(isColumnHidden(2)) revealColumn(2); else hideColumn(2,'english');
+    }
+
+    function toggleGerman(){
+      // German ist td:nth-child(3)
+      if(isColumnHidden(3)) revealColumn(3); else hideColumn(3,'german');
+    }
+
+    revealAllBtn.addEventListener('click', revealAll);
+    document.getElementById('hide-english').addEventListener('click', toggleEnglish);
+    document.getElementById('hide-german').addEventListener('click', toggleGerman);
+
+    // lade die neue YAML-Datei u2.yaml (english/german-Format)
+    fetch('u2.yaml')
+      .then(r=>{
+        if (!r.ok) throw new Error('Cannot fetch YAML: '+r.status);
+        return r.text();
+      })
+      .then(text => {
+        const data = jsyaml.load(text);
+        render(Array.isArray(data) ? data : []);
+      })
+      .catch(err=>{
+        // fallback im neuen Format (english/german)
+        const fallback = `- english: "lip"\n  german: "Lippe"\n- english: "hair"\n  german: "Haar"\n- english: "ear"\n  german: "Ohr"`;
+        const data = jsyaml.load(fallback);
+        render(Array.isArray(data) ? data : []);
+      });
+  </script>
+</body>
+</html>

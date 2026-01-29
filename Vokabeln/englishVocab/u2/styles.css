@@ -1,0 +1,111 @@
+:root{
+  --max-width:820px;
+  --idx-max-width:640px;
+  --gap:20px;
+}
+
+/* Box model */
+*,*::before,*::after{box-sizing:border-box}
+
+/* Standard body für Unit2/Seiten */
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  margin:16px;
+  padding:env(safe-area-inset-top) 16px 16px env(safe-area-inset-left);
+  -webkit-font-smoothing:antialiased;
+  color:#111;
+}
+
+/* Home/Index zentrieren */
+body.home{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff;
+  padding:calc(16px + env(safe-area-inset-top));
+}
+
+/* Index: wrap + button */
+.wrap{
+  width:100%;
+  max-width:var(--idx-max-width);
+  margin:0 auto;
+  text-align:center;
+  padding:24px;
+}
+.wrap h1{
+  font-size:clamp(1.6rem,4vw,2.4rem);
+  margin:0 0 18px;
+}
+.big-btn{
+  display:inline-block;
+  width:100%;
+  max-width:420px;
+  padding:16px 20px;
+  font-size:clamp(1rem,3.5vw,1.15rem);
+  border-radius:12px;
+  border:1px solid #444;
+  background:#f3f4f6;
+  cursor:pointer;
+  text-decoration:none;
+  color:inherit;
+  touch-action:manipulation;
+}
+@media (min-width:700px){
+  .wrap{padding:32px}
+  .big-btn{max-width:300px}
+}
+
+/* Unit2 / Tabelle */
+h1{font-size:clamp(1.1rem,4vw,1.6rem);margin:8px 0 12px}
+.reveal-btn{padding:10px 14px;font-size:1rem;border-radius:8px;margin:8px 0;display:inline-block;border:1px solid #888;background:#f7f7f8;cursor:pointer}
+
+.table-wrap{width:100%;overflow:auto}
+table{border-collapse:collapse;width:100%;max-width:var(--max-width);font-size:0.98rem;min-width:640px}
+th,td{border:1px solid #bbb;padding:8px;text-align:left;vertical-align:middle;white-space:normal}
+th{background:#f3f4f6}
+caption{font-size:1.1rem;margin-bottom:8px}
+
+/* versteckte Zellen */
+.hidden-cell{background:#111;color:transparent;border-radius:2px;cursor:pointer;user-select:none;display:inline-block;padding:2px 4px;white-space:normal}
+.hidden-cell:focus{outline:3px solid #2b8cff}
+
+/* Mobile: stacked rows (macht Tabelle auf kleinen Bildschirmen lesbar) */
+@media (max-width:640px){
+  .reveal-btn{display:block;width:100%}
+  thead{display:none}
+  table, tbody, tr, td, th { display:block; width:100% }
+  tr{margin:0 0 10px;border:0;padding:0}
+  td{padding:10px;border:1px solid #ddd;display:flex;justify-content:space-between;align-items:flex-start}
+  td::before{
+    content: attr(data-label);
+    font-weight:600;
+    margin-right:12px;
+    color:#333;
+    flex:0 0 auto;
+  }
+  td[data-label="#"]{font-size:0.95rem}
+  .hidden-cell{max-width:60vw;overflow:hidden;text-overflow:ellipsis}
+  .table-wrap{overflow:visible}
+  table{font-size:0.95rem}
+}
+
+/* Druck-Layout: nur Tabelle sichtbar, Kopfzeilen wiederholen, keine Zeilenumbrüche */
+@media print {
+  body * { visibility: hidden !important; }
+  #vocab-table, #vocab-table * { visibility: visible !important; }
+  #vocab-table { position: absolute !important; left: 0; top: 0; width: 100% !important; }
+  thead { display: table-header-group; }
+  tfoot { display: table-footer-group; }
+  table { page-break-inside: auto; }
+  tr    { page-break-inside: avoid; break-inside: avoid; }
+  td, th { page-break-inside: avoid; break-inside: avoid; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms!important;transition-duration:0.001ms!important}
+}

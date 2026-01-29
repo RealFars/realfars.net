@@ -21,3 +21,18 @@
             visibility: visible;
         }
     }
+
+button{
+  display:inline-block;
+  width:100%;
+  max-width:420px;
+  padding:16px 20px;
+  font-size:clamp(1rem,3.5vw,1.15rem);
+  border-radius:12px;
+  border:1px solid #444;
+  background:#f3f4f6;
+  cursor:pointer;
+  text-decoration:none;
+  color:inherit;
+  touch-action:manipulation;
+}
